@@ -1,10 +1,10 @@
--Sovelluksessa käyttäjät pystyvät etsimään peliseuraa sulkapalloon. Ilmoituksessa lukee missä ja milloin pelivuoro on sekä tarvittava pelaajien määrä.
--Käyttäjä pystyy luomaan tunnuksen ja kirjautumaan sisään sovellukseen.
--Käyttäjä pystyy lisäämään ilmoituksia ja muokkaamaan ja poistamaan niitä.
--Käyttäjä näkee sovellukseen lisätyt ilmoitukset.
--Käyttäjä pystyy etsimään ilmoituksia sen perusteella, milloin vuoro on.
--Käyttäjäsivu näyttää, montako ilmoitusta käyttäjä on lähettänyt ja listan ilmoituksista.
--Käyttäjä pystyy valitsemaan ilmoitukselle yhden tai useamman luokittelun (esim. Kumpula Unisport, keskitason pelaaja).
--Käyttäjä pystyy ilmoittautumaan pelivuoroon. Ilmoituksessa näytetään, ketkä käyttäjät ovat ilmoittautuneet.
+* In the app, users can search for badminton playing partners. The announcement shows where and when the playing slot is, and how many players are needed.
+* The user can create an account and log in to the app.
+* The user can add announcements, and also edit or delete them.
+* The user sees the announcements added to the app.
+* The user can search announcements based on when the slot is scheduled.
+* The user page shows how many announcements the user has posted and provides a list of their announcements.
+* The user can assign one or more categories to an announcement (e.g., Kumpula Unisport, intermediate-level player).
+* The user can sign up for a playing slot. The announcement shows which users have signed up.
 
-Pääasiallinen tietokohde on ilmoitus ja toissijainen tietokohde on ilmoittautuminen.
+The primary data entity is the announcement, and the secondary data entity is the registration (sign-up).

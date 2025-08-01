@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}Badminton Match Finder{% endblock %}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+</head>
+<body>
+  <header>
+    <h1><a href="{{ url_for('index') }}">Badminton Match Finder</a></h1>
+    <nav>
+      <a href="{{ url_for('index') }}">Home</a>
+      {% if session.get('user_id') %}
+        | <a href="{{ url_for('new_announcement') }}">New Announcement</a>
+        | <a href="{{ url_for('logout') }}">Log out</a>
+      {% else %}
+        | <a href="{{ url_for('login') }}">Log in</a>
+        | <a href="{{ url_for('register') }}">Register</a>
+      {% endif %}
+    </nav>
+  </header>
+
+  {% with messages = get_flashed_messages() %}
+    {% if messages %}
+      <ul class="flashes">
+        {% for msg in messages %}
+          <li>{{ msg }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
+  {% endwith %}
+
+  <main>
+    {% block content %}{% endblock %}
+  </main>
+
+  <footer>
+    <p>&copy; 2025 Badminton Match Finder</p>
+  </footer>
+</body>
+</html>

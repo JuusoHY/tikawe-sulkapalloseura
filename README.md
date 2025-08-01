@@ -9,6 +9,7 @@ Pääasiallinen tietokohde on ilmoitus ja toissijainen tietokohde on ilmoittautu
 
 
 Näin käyttäjä asentaa sovelluksen:
+
 Asenna flask-kirjasto:
 
 $ pip install flask

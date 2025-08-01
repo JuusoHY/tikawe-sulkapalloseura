@@ -6,3 +6,17 @@
 6. Käyttäjä pystyy ilmoittautumaan pelivuoroon. Ilmoituksessa näytetään, ketkä käyttäjät ovat ilmoittautuneet.
 
 Pääasiallinen tietokohde on ilmoitus ja toissijainen tietokohde on ilmoittautuminen.
+
+
+Näin käyttäjä asentaa sovelluksen:
+Asenna flask-kirjasto:
+
+$ pip install flask
+
+Luo tietokannan taulut ja alkutiedot:
+
+$ sqlite3 database.db < schema.sql
+$ sqlite3 database.db < init.sql
+Käynnistä sovelluksen näin:
+
+$ flask run

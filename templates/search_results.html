@@ -1,0 +1,18 @@
+{% extends "layout.html" %}
+{% block title %}Search: “{{ query }}” — Badminton Match Finder{% endblock %}
+{% block content %}
+  <h2>Search Results for “{{ query }}”</h2>
+  {% if announcements %}
+    <ul>
+      {% for ann in announcements %}
+        <li>
+          <a href="{{ url_for('show_announcement', ann_id=ann['id']) }}">
+            {{ ann['title'] }}
+          </a> by {{ ann['username'] }}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No announcements found matching “{{ query }}.”</p>
+  {% endif %}
+{% endblock %}

@@ -19,6 +19,16 @@
         | <a href="{{ url_for('register') }}">Register</a>
       {% endif %}
     </nav>
+    <!-- Search form -->
+    <form action="{{ url_for('search') }}" method="get" style="display:inline; margin-left:1em;">
+      <input
+        name="query"
+        type="search"
+        placeholder="Search announcements…"
+        value="{{ request.args.get('query', '') }}"
+      >
+      <button type="submit">🔍</button>
+    </form>
   </header>
 
   {% with messages = get_flashed_messages() %}

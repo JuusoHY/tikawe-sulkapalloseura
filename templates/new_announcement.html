@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block title %}New Announcement{% endblock %}
+{% block content %}
+  <h2>Create Announcement</h2>
+  <form method="post" action="{{ url_for('create_announcement') }}">
+    <label>Title:<br><input name="title" required></label><br>
+    <label>Description:<br><textarea name="description" required></textarea></label><br>
+    <label>Location:<br><input name="location"></label><br>
+    <label>Time:<br><input name="time" type="datetime-local"></label><br>
+    <label>Slots needed:<br><input name="slots_needed" type="number" min="1" value="1"></label><br>
+    <button type="submit">Create</button>
+  </form>
+{% endblock %}

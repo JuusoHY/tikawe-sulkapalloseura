@@ -1,4 +1,5 @@
 import click
+import secrets
 import sqlite3
 from flask import (
     Flask, render_template, request, redirect,
@@ -25,6 +26,13 @@ def init_db_command():
 def require_login():
     """Abort with 403 if the user isn’t logged in."""
     if "user_id" not in session:
+        abort(403)
+
+def check_csrf():
+    """Abort with 403 if CSRF token missing or invalid."""
+    if "csrf_token" not in request.form:
+        abort(403)
+    if request.form["csrf_token"] != session.get("csrf_token"):
         abort(403)
 
 # --- Home: list all announcements ---
@@ -85,6 +93,8 @@ def login_post():
         session.clear()
         session["user_id"] = user_id
         session["username"] = username
+        # Generate per-session CSRF token on login
+        session["csrf_token"] = secrets.token_hex(16)
         return redirect(url_for("index"))
     else:
         flash("Invalid credentials.")
@@ -117,6 +127,8 @@ def new_announcement():
 @app.route("/announcement/create", methods=["POST"])
 def create_announcement():
     require_login()
+    check_csrf()
+
     title       = request.form["title"]
     description = request.form["description"]
     location    = request.form["location"]
@@ -171,6 +183,8 @@ def edit_announcement(ann_id):
 @app.route("/announcement/<int:ann_id>/update", methods=["POST"])
 def update_announcement(ann_id):
     require_login()
+    check_csrf()
+
     ann = announcements.get_announcement(ann_id)
     if not ann or ann["user_id"] != session["user_id"]:
         abort(403)
@@ -201,6 +215,8 @@ def update_announcement(ann_id):
 @app.route("/announcement/<int:ann_id>/delete", methods=["POST"])
 def delete_announcement(ann_id):
     require_login()
+    check_csrf()
+
     ann = announcements.get_announcement(ann_id)
     if not ann or ann["user_id"] != session["user_id"]:
         abort(403)
@@ -212,6 +228,8 @@ def delete_announcement(ann_id):
 @app.route("/announcement/<int:ann_id>/message", methods=["POST"])
 def add_message(ann_id):
     require_login()
+    check_csrf()
+
     ann = announcements.get_announcement(ann_id)
     if not ann:
         abort(404)

@@ -3,11 +3,25 @@
 {% block content %}
   <h2>Create Announcement</h2>
   <form method="post" action="{{ url_for('create_announcement') }}">
+    <input type="hidden" name="csrf_token" value="{{ session.csrf_token }}">
     <label>Title:<br><input name="title" required></label><br>
     <label>Description:<br><textarea name="description" required></textarea></label><br>
     <label>Location:<br><input name="location"></label><br>
     <label>Time:<br><input name="time" type="datetime-local"></label><br>
     <label>Slots needed:<br><input name="slots_needed" type="number" min="1" value="1"></label><br>
+
+    <h3>Classifications</h3>
+    {% for title, values in all_classes.items() %}
+      <label>{{ title }}
+        <select name="classes">
+          <option value="">--</option>
+          {% for v in values %}
+            <option value="{{ title }}:{{ v }}">{{ v }}</option>
+          {% endfor %}
+        </select>
+      </label><br>
+    {% endfor %}
+
     <button type="submit">Create</button>
   </form>
 {% endblock %}

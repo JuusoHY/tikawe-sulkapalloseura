@@ -27,6 +27,7 @@ def require_login():
     if "user_id" not in session:
         abort(403)
 
+# --- Home: list all announcements ---
 @app.route("/")
 def index():
     all_anns = announcements.get_announcements()
@@ -84,6 +85,17 @@ def login_post():
 def logout():
     session.clear()
     return redirect(url_for("index"))
+
+# --- User page: stats + user’s announcements ---
+
+@app.route("/user/<int:user_id>")
+def show_user(user_id):
+    user = users.get_user(user_id)
+    if not user:
+        abort(404)
+    user_anns = users.get_announcements(user_id)
+    total = users.get_announcement_count(user_id)
+    return render_template("show_user.html", user=user, announcements=user_anns, total=total)
 
 # --- Announcement CRUD ---
 
@@ -152,12 +164,3 @@ def delete_announcement(ann_id):
         abort(403)
     announcements.delete_announcement(ann_id)
     return redirect(url_for("index"))
-
-@app.route("/search")
-def search():
-    q = request.args.get("query", "").strip()
-    if not q:
-        return redirect(url_for("index"))
-
-    results = announcements.find_announcements(q)
-    return render_template("search_results.html", query=q, announcements=results)

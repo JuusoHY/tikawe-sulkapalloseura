@@ -9,6 +9,11 @@
 <body>
   <header>
     <h1><a href="{{ url_for('index') }}">Badminton Match Finder</a></h1>
+    {% if session.get('user_id') %}
+      <p>
+        Logged in as <a href="{{ url_for('show_user', user_id=session.get('user_id')) }}">{{ session.get('username') }}</a>
+      </p>
+    {% endif %}
     <nav>
       <a href="{{ url_for('index') }}">Home</a>
       {% if session.get('user_id') %}
@@ -19,16 +24,6 @@
         | <a href="{{ url_for('register') }}">Register</a>
       {% endif %}
     </nav>
-    <!-- Search form -->
-    <form action="{{ url_for('search') }}" method="get" style="display:inline; margin-left:1em;">
-      <input
-        name="query"
-        type="search"
-        placeholder="Search announcements…"
-        value="{{ request.args.get('query', '') }}"
-      >
-      <button type="submit">🔍</button>
-    </form>
   </header>
 
   {% with messages = get_flashed_messages() %}
@@ -44,7 +39,5 @@
   <main>
     {% block content %}{% endblock %}
   </main>
-
-
 </body>
 </html>

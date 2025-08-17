@@ -1,0 +1,28 @@
+{% extends "layout.html" %}
+{% block title %}{{ user['username'] }} — Profile{% endblock %}
+{% block content %}
+  <h2>User: {{ user['username'] }}</h2>
+
+  <section>
+    <h3>Stats</h3>
+    <ul>
+      <li>Announcements created: {{ total }}</li>
+    </ul>
+  </section>
+
+  <section>
+    <h3>Announcements by {{ user['username'] }}</h3>
+    {% if announcements %}
+      <ul>
+        {% for ann in announcements %}
+          <li>
+            <a href="{{ url_for('show_announcement', ann_id=ann['id']) }}">{{ ann['title'] }}</a>
+            <small>({{ ann['location'] }} — {{ ann['time'] }})</small>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>No announcements yet.</p>
+    {% endif %}
+  </section>
+{% endblock %}

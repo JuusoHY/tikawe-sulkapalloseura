@@ -33,6 +33,15 @@ def index():
     all_anns = announcements.get_announcements()
     return render_template("index.html", announcements=all_anns)
 
+# --- Search ---
+@app.route("/search")
+def search():
+    q = request.args.get("query", "").strip()
+    if not q:
+        return redirect(url_for("index"))
+    results = announcements.find_announcements(q)
+    return render_template("search_results.html", query=q, announcements=results)
+
 # --- User Registration & Login ---
 
 @app.route("/register", methods=["GET"])
@@ -97,12 +106,13 @@ def show_user(user_id):
     total = users.get_announcement_count(user_id)
     return render_template("show_user.html", user=user, announcements=user_anns, total=total)
 
-# --- Announcement CRUD ---
+# --- Announcement CRUD + classifications ---
 
 @app.route("/announcement/new")
 def new_announcement():
     require_login()
-    return render_template("new_announcement.html")
+    all_classes = announcements.get_all_classes()
+    return render_template("new_announcement.html", all_classes=all_classes)
 
 @app.route("/announcement/create", methods=["POST"])
 def create_announcement():
@@ -118,17 +128,31 @@ def create_announcement():
         flash("Title and description are required.")
         return redirect(url_for("new_announcement"))
 
-    announcements.create_announcement(
-        title, description, location, time, slots, user_id
+    # Validate class selections against DB
+    all_classes = announcements.get_all_classes()
+    classes = []
+    for entry in request.form.getlist("classes"):
+        if entry:
+            class_title, class_value = entry.split(":")
+            if class_title not in all_classes:
+                abort(403)
+            if class_value not in all_classes[class_title]:
+                abort(403)
+            classes.append((class_title, class_value))
+
+    ann_id = announcements.create_announcement(
+        title, description, location, time, slots, user_id, classes
     )
-    return redirect(url_for("index"))
+    return redirect(url_for("show_announcement", ann_id=ann_id))
 
 @app.route("/announcement/<int:ann_id>")
 def show_announcement(ann_id):
     ann = announcements.get_announcement(ann_id)
     if not ann:
         abort(404)
-    return render_template("show_announcement.html", ann=ann)
+    classes = announcements.get_classes(ann_id)
+    msgs = announcements.get_messages(ann_id)
+    return render_template("show_announcement.html", ann=ann, classes=classes, messages=msgs)
 
 @app.route("/announcement/<int:ann_id>/edit")
 def edit_announcement(ann_id):
@@ -136,7 +160,13 @@ def edit_announcement(ann_id):
     ann = announcements.get_announcement(ann_id)
     if not ann or ann["user_id"] != session["user_id"]:
         abort(403)
-    return render_template("edit_announcement.html", ann=ann)
+
+    all_classes = announcements.get_all_classes()
+    selected = {title: "" for title in all_classes.keys()}
+    for entry in announcements.get_classes(ann_id):
+        selected[entry["title"]] = entry["value"]
+
+    return render_template("edit_announcement.html", ann=ann, all_classes=all_classes, selected_classes=selected)
 
 @app.route("/announcement/<int:ann_id>/update", methods=["POST"])
 def update_announcement(ann_id):
@@ -151,8 +181,20 @@ def update_announcement(ann_id):
     time        = request.form["time"]
     slots       = request.form["slots_needed"]
 
+    # Validate class selections
+    all_classes = announcements.get_all_classes()
+    classes = []
+    for entry in request.form.getlist("classes"):
+        if entry:
+            class_title, class_value = entry.split(":")
+            if class_title not in all_classes:
+                abort(403)
+            if class_value not in all_classes[class_title]:
+                abort(403)
+            classes.append((class_title, class_value))
+
     announcements.update_announcement(
-        ann_id, title, description, location, time, slots
+        ann_id, title, description, location, time, slots, classes
     )
     return redirect(url_for("show_announcement", ann_id=ann_id))
 
@@ -164,3 +206,26 @@ def delete_announcement(ann_id):
         abort(403)
     announcements.delete_announcement(ann_id)
     return redirect(url_for("index"))
+
+# --- Additional info/messages on someone else’s announcement ---
+
+@app.route("/announcement/<int:ann_id>/message", methods=["POST"])
+def add_message(ann_id):
+    require_login()
+    ann = announcements.get_announcement(ann_id)
+    if not ann:
+        abort(404)
+
+    # Only on someone else’s announcement
+    if ann["user_id"] == session["user_id"]:
+        flash("You cannot send additional info to your own announcement.")
+        return redirect(url_for("show_announcement", ann_id=ann_id))
+
+    content = request.form.get("content", "").strip()
+    if not content or len(content) > 1000:
+        flash("Message must be 1–1000 characters.")
+        return redirect(url_for("show_announcement", ann_id=ann_id))
+
+    announcements.add_message(ann_id, session["user_id"], content)
+    flash("Message added.")
+    return redirect(url_for("show_announcement", ann_id=ann_id))

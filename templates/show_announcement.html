@@ -17,6 +17,26 @@
     </ul>
   {% endif %}
 
+  <h3>Additional info</h3>
+  {% if messages %}
+    <ul>
+      {% for m in messages %}
+        <li><strong>{{ m['username'] }}:</strong> {{ m['content'] }} <small>({{ m['created_at'] }})</small></li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>No messages yet.</p>
+  {% endif %}
+
+  {% if session.get('user_id') and session.get('user_id') != ann['user_id'] %}
+    <form method="post" action="{{ url_for('add_message', ann_id=ann['id']) }}">
+      <label>Send additional info:<br>
+        <textarea name="content" maxlength="1000" required></textarea>
+      </label><br>
+      <button type="submit">Send</button>
+    </form>
+  {% endif %}
+
   {% if session.get('user_id') == ann['user_id'] %}
     <p>
       <a href="{{ url_for('edit_announcement', ann_id=ann['id']) }}">Edit</a>

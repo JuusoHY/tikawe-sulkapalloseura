@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block title %}{{ ann['title'] }}{% endblock %}
+{% block content %}
+  <h2>{{ ann['title'] }}</h2>
+  <p><strong>Description:</strong> {{ ann['description'] }}</p>
+  <p><strong>Location:</strong> {{ ann['location'] }}</p>
+  <p><strong>Time:</strong> {{ ann['time'] }}</p>
+  <p><strong>Slots needed:</strong> {{ ann['slots_needed'] }}</p>
+  <p><strong>By:</strong> {{ ann['username'] }}</p>
+
+  {% if classes %}
+    <h3>Classifications</h3>
+    <ul>
+      {% for c in classes %}
+        <li>{{ c['title'] }}: {{ c['value'] }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
+
+  {% if session.get('user_id') == ann['user_id'] %}
+    <p>
+      <a href="{{ url_for('edit_announcement', ann_id=ann['id']) }}">Edit</a>
+      |
+      <form method="post" action="{{ url_for('delete_announcement', ann_id=ann['id']) }}" style="display:inline">
+        <button type="submit" onclick="return confirm('Delete this?')">Delete</button>
+      </form>
+    </p>
+  {% endif %}
+{% endblock %}
